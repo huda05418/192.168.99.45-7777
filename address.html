@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alamat Pengiriman</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="account-header">
+    <button onclick="window.history.back()">⬅️</button>
+    <h1>Fitur alamat masi tahap pengembangan dan belum maksimal, pastikan selalu update info di Sosial media saya sendiri</h1>
+  </header>
+
+  <section class="address-container">
+    <div class="address-instruction">
+      <p>Silakan isi form berikut dengan alamat lengkap penerima:</p>
+    </div>
+
+    <form id="address-form" class="address-form">
+      <table class="address-table">
+        <tr>
+          <td><label for="fullname">Nama Penerima</label></td>
+          <td><input type="text" id="fullname" required></td>
+        </tr>
+        <tr>
+          <td><label for="phone">No. HP</label></td>
+          <td><input type="tel" id="phone" required></td>
+        </tr>
+        <tr>
+          <td><label for="province">Provinsi</label></td>
+          <td><input type="text" id="province" required></td>
+        </tr>
+        <tr>
+          <td><label for="city">Kota/Kabupaten</label></td>
+          <td><input type="text" id="city" required></td>
+        </tr>
+        <tr>
+          <td><label for="district">Kecamatan</label></td>
+          <td><input type="text" id="district" required></td>
+        </tr>
+        <tr>
+          <td><label for="postal-code">Kode Pos</label></td>
+          <td><input type="text" id="postal-code" required></td>
+        </tr>
+        <tr>
+          <td><label for="street">Alamat Lengkap</label></td>
+          <td><textarea id="street" rows="3" required></textarea></td>
+        </tr>
+        <tr>
+          <td><label for="details">Detail Tambahan</label></td>
+          <td><textarea id="details" rows="2"></textarea></td>
+        </tr>
+        <tr>
+          <td><label>Jenis Alamat</label></td>
+          <td>
+            <select id="address-type">
+              <option value="rumah">Rumah</option>
+              <option value="kantor">Kantor</option>
+              <option value="kos">Kos/Kontrakan</option>
+            </select>
+          </td>
+        </tr>
+      </table>
+      <button type="submit" class="save-btn">Simpan Alamat</button>
+    </form>
+
+    <div class="output-section">
+      <h3>Form Output</h3>
+      <div class="output-preview" id="output-preview">
+        <p>Isian akan muncul di sini saat Anda mengetik...</p>
+      </div>
+    </div>
+  </section>
+
+  <script src="produk.js"></script>
+  <script>
+    // Real-time form preview
+    const formInputs = document.querySelectorAll('#address-form input, #address-form textarea, #address-form select');
+    
+    formInputs.forEach(input => {
+      input.addEventListener('input', updateOutputPreview);
+    });
+
+    function updateOutputPreview() {
+      const output = document.getElementById('output-preview');
+      const formData = {
+        fullname: document.getElementById('fullname').value || '[Nama Penerima]',
+        phone: document.getElementById('phone').value || '[No. HP]',
+        province: document.getElementById('province').value || '[Provinsi]',
+        city: document.getElementById('city').value || '[Kota/Kabupaten]',
+        district: document.getElementById('district').value || '[Kecamatan]',
+        postalCode: document.getElementById('postal-code').value || '[Kode Pos]',
+        street: document.getElementById('street').value || '[Alamat Lengkap]',
+        details: document.getElementById('details').value || '[Detail Tambahan]',
+        type: document.getElementById('address-type').value === 'rumah' ? 'Rumah' : 
+              document.getElementById('address-type').value === 'kantor' ? 'Kantor' : 'Kos/Kontrakan'
+      };
+
+      output.innerHTML = `
+        <div class="output-address">
+          <p><strong>Nama Penerima:</strong> ${formData.fullname}</p>
+          <p><strong>No. HP:</strong> ${formData.phone}</p>
+          <p><strong>Alamat:</strong> ${formData.street}</p>
+          <p><strong>Kecamatan:</strong> ${formData.district}</p>
+          <p><strong>Kota/Kabupaten:</strong> ${formData.city}</p>
+          <p><strong>Provinsi:</strong> ${formData.province}</p>
+          <p><strong>Kode Pos:</strong> ${formData.postalCode}</p>
+          <p><strong>Detail Tambahan:</strong> ${formData.details}</p>
+          <p><strong>Jenis Alamat:</strong> ${formData.type}</p>
+        </div>
+      `;
+    }
+
+    // Save address
+    document.getElementById('address-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      const addressData = {
+        fullname: document.getElementById('fullname').value,
+        phone: document.getElementById('phone').value,
+        province: document.getElementById('province').value,
+        city: document.getElementById('city').value,
+        district: document.getElementById('district').value,
+        postalCode: document.getElementById('postal-code').value,
+        street: document.getElementById('street').value,
+        details: document.getElementById('details').value,
+        type: document.getElementById('address-type').value
+      };
+
+      if (saveAddress(addressData)) {
+        alert('Alamat penerima berhasil disimpan!');
+        window.location.href = 'checkout-wa.html';
+      } else {
+        alert('Gagal menyimpan alamat');
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Keranjang Belanja</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="account-header">
+        <button onclick="window.history.back()">⬅️</button>
+<h1>Fitur keranjang masi tahap pengembangan dan belum maksimal, pastikan selalu update info di Sosial media saya sendiri</h1>
+    </header>
+
+    <main id="cart-items">
+        <!-- Items akan diisi oleh JavaScript -->
+    </main>
+
+    <div class="cart-summary">
+        <p>Total: <span id="total-price">Rp0</span></p>
+        <button onclick="checkout()">Checkout</button>
+        
+    </div>
+    
+       
+       
+      </section>
+      <p>Instagram: <a href="https://instagram.com/huda_ogg" target="_blank">@huda_ogg</a></p>
+         <p>Email:hudah0999@gmail.com</p>
+      </button>
+
+    <script src="produk.js"></script>
+    <script src="script.js"></script>
+    <script>
+        function loadCart() {
+            const cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const container = document.getElementById('cart-items');
+            const totalElement = document.getElementById('total-price');
+
+            if (cart.length === 0) {
+                container.innerHTML = '<p class="empty-cart">Keranjang kosong</p>';
+                totalElement.textContent = 'Rp0';
+                return;
+            }
+
+            container.innerHTML = cart.map(item => `
+                <div class="cart-item">
+                    <img src="${item.image}">
+                    <div class="item-info">
+                        <h3>${item.name}</h3>
+                        <p>Rp${item.discountedPrice?.toLocaleString() || item.price.toLocaleString()}</p>
+                        <div class="quantity-control">
+                            <button onclick="updateQuantity(${item.id}, -1)">-</button>
+                            <span>${item.quantity}</span>
+                            <button onclick="updateQuantity(${item.id}, 1)">+</button>
+                        </div>
+                    </div>
+                    <button class="remove-btn" onclick="removeFromCart(${item.id})">×</button>
+                </div>
+            `).join('');
+
+            const total = cart.reduce((sum, item) => 
+                sum + (item.discountedPrice || item.price) * item.quantity, 0);
+            totalElement.textContent = `Rp${total.toLocaleString()}`;
+        }
+
+        function updateQuantity(productId, change) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            const item = cart.find(i => i.id === productId);
+            
+            if (item) {
+                item.quantity += change;
+                if (item.quantity <= 0) {
+                    cart = cart.filter(i => i.id !== productId);
+                }
+                localStorage.setItem('cart', JSON.stringify(cart));
+                loadCart();
+                updateCartCount();
+            }
+        }
+
+        function removeFromCart(productId) {
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            cart = cart.filter(i => i.id !== productId);
+            localStorage.setItem('cart', JSON.stringify(cart));
+            loadCart();
+            updateCartCount();
+        }
+
+        function checkout() {
+            alert('Checkout berhasil!');
+            localStorage.removeItem('cart');
+            loadCart();
+            updateCartCount();
+        }
+
+        document.addEventListener('DOMContentLoaded', loadCart);
+    </script>
+</body>
+</html>

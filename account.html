@@ -1,0 +1,82 @@
+<!-- account.html (updated bagian profile section) -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Account</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="account-header">
+    <h2>👤 AKUN SAYA</h2>
+  </header>
+
+  <!-- Profil -->
+  <section class="profile-section">
+    <div class="profile-pic">
+      <img src="img/default-profile.jpg" id="profile-image">
+    </div>
+    <h3 id="profile-name">Nama Pengguna</h3>
+    <p id="profile-id">ID: USR-001</p>
+    <p id="profile-email">Email: user@example.com</p>
+    <button onclick="showEditProfileForm()">✏️ Edit Profil</button>
+  </section>
+
+  <!-- Form Edit Profil (hidden by default) -->
+  <section id="edit-profile-form" class="edit-profile-form" style="display: none;">
+    <h3>Edit Profil</h3>
+    <form id="profile-form">
+      <div class="form-group">
+        <label for="edit-name">Nama Lengkap</label>
+        <input type="text" id="edit-name" required>
+      </div>
+      <div class="form-group">
+        <label for="edit-email">Alamat Email</label>
+        <input type="email" id="edit-email" required>
+      </div>
+      <div class="form-group">
+        <label for="edit-pin">PIN (Maks 10 digit)</label>
+        <input type="password" id="edit-pin" maxlength="10" required>
+      </div>
+      <div class="form-actions">
+        <button type="button" onclick="cancelEditProfile()">Batal</button>
+        <button type="submit">Simpan</button>
+      </div>
+    </form>
+  </section>
+
+  <!-- Menu -->
+  <section class="account-menu">
+    <div class="menu-item" onclick="showOrders('diproses')">
+      <span>📦</span> Pesanan Diproses
+    </div>
+    <div class="menu-item" onclick="showOrders('dikirim')">
+      <span>🚚</span> Sedang Dikirim
+    </div>
+    <div class="menu-item" onclick="showOrders('selesai')">
+      <span>✅</span> Pesanan Selesai
+    </div>
+    <div class="menu-item" onclick="window.location.href='address.html'">
+      <span>🏠</span> Kelola Alamat
+    </div>
+  </section>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <button onclick="window.location.href='index.html'">
+      <span>🏠</span> Home
+    </button>
+    <button onclick="showCategoryPopup()">
+      <span>🗂️</span> Kategori
+    </button>
+    <button class="active">
+      <span>👤</span> Account
+    </button>
+  </nav>
+
+  <script src="produk.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

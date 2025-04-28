@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SERBA 35 RUPIAH</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header dengan Search Bar -->
+  <header>
+    <form id="search-form" onsubmit="handleSearch(event)">
+      <input 
+        type="text" 
+        id="search-input" 
+        placeholder="Cari produk (contoh: kemeja)..."
+      >
+      <button type="submit" hidden>Cari</button>
+    </form>
+    
+    <div id="loading" class="loading" style="display: none;">
+      <div class="loader"></div>
+      <p>Mencari produk...</p>
+    </div>
+  </header>
+
+  <!-- Banner Rekomendasi -->
+  <section class="banner-section">
+    <h3>🔥 REKOMENDASI</h3>
+    <div id="recommended-banner" class="banner-scroll"></div>
+  </section>
+
+  <!-- Banner Diskon -->
+  <section class="banner-section">
+    <h3>💳 PROMO DISKON</h3>
+    <div id="discount-banner" class="banner-scroll"></div>
+  </section>
+
+  <!-- Daftar Produk -->
+  <section class="product-section">
+    <h3>PRODUK TERBARU</h3>
+    <div id="product-list" class="product-grid"></div>
+  </section>
+
+  <!-- Popup Kategori -->
+  <div id="category-popup" class="popup">
+    <div class="popup-content">
+      <h3>PILIH KATEGORI</h3>
+      <div id="category-list"></div>
+      <div class="popup-actions">
+        <button onclick="applyCategoryFilter()">TERAPKAN</button>
+        <button onclick="resetCategory()">RESET</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <button class="active" onclick="window.location.href='index.html'">
+      <span>🏠</span> Home
+    </button>
+    <button onclick="showCategoryPopup()">
+      <span>🗂️</span> Kategori
+    </button>
+    <button onclick="window.location.href='cart.html'">
+      <span>🛒</span> 
+      <span id="cart-count">0</span>
+    </button>
+    <button onclick="window.location.href='account.html'">
+      <span>👤</span> Account
+    </button>
+  </nav>
+
+  <script src="produk.js"></script>
+  <script>
+// Fungsi untuk menampilkan produk rekomendasi di banner
+function displayRecommendedBanner() {
+  const recommendedBanner = document.getElementById('recommended-banner');
+  const recommendedProducts = getRecommendedProducts();
+  
+  recommendedBanner.innerHTML = '';
+  
+  recommendedProducts.forEach(product => {
+    const bannerCard = document.createElement('div');
+    bannerCard.className = 'banner-card';
+    bannerCard.innerHTML = `
+      <img src="${product.image}" alt="${product.name}">
+      <p class="banner-product-name">${product.name}</p>
+      <p class="banner-product-price">Rp${(product.discountedPrice || product.price).toLocaleString('id-ID')}</p>
+      ${product.discountedPrice ? `<div class="discount-badge">DISKON</div>` : ''}
+    `;
+    
+    bannerCard.addEventListener('click', () => {
+      window.location.href = `product-detail.html?id=${product.id}`;
+    });
+    
+    recommendedBanner.appendChild(bannerCard);
+  });
+}
+
+// Fungsi untuk menampilkan produk diskon di banner
+function displayDiscountBanner() {
+  const discountBanner = document.getElementById('discount-banner');
+  const discountedProducts = getDiscountedProducts();
+  
+  discountBanner.innerHTML = '';
+  
+  discountedProducts.forEach(product => {
+    const discountPercent = Math.round((1 - product.discountedPrice/product.price) * 100);
+    const bannerCard = document.createElement('div');
+    bannerCard.className = 'banner-card';
+    bannerCard.innerHTML = `
+      <img src="${product.image}" alt="${product.name}">
+      <p class="banner-product-name">${product.name}</p>
+      <div class="banner-price-container">
+        <span class="original-price">Rp${product.price.toLocaleString('id-ID')}</span>
+        <span class="discount-price">Rp${product.discountedPrice.toLocaleString('id-ID')}</span>
+      </div>
+      <div class="discount-badge">-${discountPercent}%</div>
+    `;
+    
+    bannerCard.addEventListener('click', () => {
+      window.location.href = `product-detail.html?id=${product.id}`;
+    });
+    
+    discountBanner.appendChild(bannerCard);
+  });
+}
+    // Fungsi untuk menampilkan daftar produk
+    function displayProducts(products) {
+      const productList = document.getElementById('product-list');
+      productList.innerHTML = '';
+      
+      products.forEach(product => {
+        const productCard = document.createElement('div');
+        productCard.className = 'product-card';
+        productCard.innerHTML = `
+          <img src="${product.image}" alt="${product.name}" class="product-image">
+          <div class="product-info">
+            <h4>${product.name}</h4>
+            <div class="price-container">
+              ${product.discountedPrice ? 
+                `<span class="original-price">Rp${product.price.toLocaleString('id-ID')}</span>` : ''}
+              <span class="price">Rp${(product.discountedPrice || product.price).toLocaleString('id-ID')}</span>
+            </div>
+            <p class="sold">⭐ ${product.rating} | Terjual: ${product.sold}+</p>
+          </div>
+        `;
+        
+        // Tambahkan event click untuk navigasi ke detail produk
+        productCard.addEventListener('click', () => {
+          window.location.href = `product-detail.html?id=${product.id}`;
+        });
+        
+        productList.appendChild(productCard);
+      });
+    }
+
+    // Fungsi untuk menangani pencarian produk
+    function handleSearch(event) {
+      event.preventDefault();
+      const searchInput = document.getElementById('search-input');
+      const keyword = searchInput.value.trim();
+      
+      if (keyword) {
+        document.getElementById('loading').style.display = 'block';
+        
+        // Simulasi loading
+        setTimeout(() => {
+          const searchResults = searchProducts(keyword);
+          displayProducts(searchResults);
+          document.getElementById('loading').style.display = 'none';
+        }, 1000);
+      }
+    }
+
+    // Fungsi untuk menampilkan popup kategori
+    function showCategoryPopup() {
+      const popup = document.getElementById('category-popup');
+      const categoryList = document.getElementById('category-list');
+      
+      categoryList.innerHTML = '';
+      
+      categories.forEach(category => {
+        const categoryItem = document.createElement('div');
+        categoryItem.className = 'category-item';
+        categoryItem.innerHTML = `
+          <input type="checkbox" id="cat-${category.id}" value="${category.id}">
+          <label for="cat-${category.id}">${category.name}</label>
+        `;
+        categoryList.appendChild(categoryItem);
+      });
+      
+      popup.style.display = 'flex';
+    }
+
+    // Fungsi untuk menerapkan filter kategori
+    function applyCategoryFilter() {
+      const popup = document.getElementById('category-popup');
+      const checkboxes = document.querySelectorAll('#category-list input[type="checkbox"]:checked');
+      const selectedCategories = Array.from(checkboxes).map(cb => cb.value);
+      
+      if (selectedCategories.length > 0) {
+        const filteredProducts = products.filter(product => 
+          selectedCategories.includes(product.category)
+        );
+        displayProducts(filteredProducts);
+      }
+      
+      popup.style.display = 'none';
+    }
+
+    // Fungsi untuk mereset filter kategori
+    function resetCategory() {
+      const popup = document.getElementById('category-popup');
+      const checkboxes = document.querySelectorAll('#category-list input[type="checkbox"]');
+      
+      checkboxes.forEach(cb => cb.checked = false);
+      displayProducts(products);
+      popup.style.display = 'none';
+    }
+
+    // Inisialisasi halaman saat pertama kali dimuat
+    document.addEventListener('DOMContentLoaded', () => {
+      displayRecommendedBanner();
+      displayDiscountBanner();
+      displayProducts(products);
+      
+      // Update cart count
+      updateCartCount();
+      
+      // Event listener untuk search form
+      document.getElementById('search-form').addEventListener('submit', handleSearch);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout via WhatsApp</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="account-header">
+    <button onclick="window.history.back()">⬅️</button>
+    <h2>CHECKOUT VIA WHATSAPP</h2>
+  </header>
+
+  <main class="checkout-container">
+    <div class="checkout-notice">
+      <h3>Panduan Checkout</h3>
+      <p>Silakan salin pesan di bawah ini dan kirim ke WhatsApp kami untuk menyelesaikan pembelian:</p>
+      
+      <div class="checkout-message" id="checkout-message">
+        <!-- Pesan akan diisi oleh JavaScript -->
+      </div>
+      
+      <button class="copy-button" onclick="copyCheckoutMessage()">Salin Pesan</button>
+      
+      <a id="whatsapp-link" href="#" class="whatsapp-button">
+        Buka WhatsApp
+      </a>
+    </div>
+
+    <div class="payment-info">
+      <h3>Informasi Pembayaran</h3>
+      <ul>
+        <li>Pembayaran hanya dilakukan via DANA</li>
+        <li>Harga sudah termasuk PPN (tidak ada biaya tambahan)</li>
+        <li>Tidak ada ongkos kirim (gratis ongkir)</li>
+        <li>Barang akan dikirim setelah pembayaran diterima</li>
+      </ul>
+    </div>
+
+    <div class="address-form">
+      <h3>contoh : </h3>
+      <p>pastikan terisi semua dengan jelas dan kirim pesan seperti ini ke WhatsApp Kami</p>
+      <div class="address-details">
+        <p><strong>Nama:</strong> <span id="display-fullname"></span></p>
+        <p><strong>Telepon:</strong> <span id="display-phone"></span></p>
+        <p><strong>Alamat:</strong> <span id="display-street"></span></p>
+        <p><span id="display-district"></span>, <span id="display-province"></span></p>
+        <p><strong>Kode Pos:</strong> <span id="display-postal-code"></span></p>
+        <p><strong>Detail:</strong> <span id="display-details"></span></p>
+        <p><strong>Jenis:</strong> <span id="display-type"></span></p>
+      </div>
+     
+    </div>
+  </main>
+
+  <script src="produk.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Ambil produk yang dipilih
+      const checkoutItems = JSON.parse(localStorage.getItem('checkoutItems')) || [];
+      const address = getAddress();
+      
+      // Format pesan WhatsApp
+      let message = "Halo, saya ingin membeli produk berikut:\n\n";
+      
+      checkoutItems.forEach(item => {
+        const product = getProductById(item.id);
+        message += `- ${product.name} (ID: ${product.id})\n`;
+        message += `  Harga: Rp${item.price.toLocaleString('id-ID')}\n`;
+        message += `  Jumlah: ${item.quantity}\n\n`;
+      });
+      
+      message += `Total: Rp${checkoutItems.reduce((total, item) => total + (item.price * item.quantity), 0).toLocaleString('id-ID')}\n\n`;
+      
+      message += "Alamat pengiriman:\n";
+      if (address) {
+        message += `Nama: \n`;
+        message += `Telepon: \n`;
+        message += `Alamat: \n`;
+        message += `Kecamatan:                 , Provinsi: \n`;
+        message += `Kode Pos: \n`;
+        message += `Detail: \n`;
+        message += `Jenis: rumah / kantor\n\n`;
+      } else {
+        message += "Alamat belum diatur\n\n";
+      }
+      
+      message += "Saya akan melakukan pembayaran via DANA setelah konfirmasi dari admin.";
+      
+      // Tampilkan pesan
+      document.getElementById('checkout-message').textContent = message;
+      
+      // Set link WhatsApp
+      const encodedMessage = encodeURIComponent(message);
+      document.getElementById('whatsapp-link').href = `https://wa.me/6283842511651?text=${encodedMessage}`;
+      
+      // Tampilkan alamat jika ada
+      if (address) {
+        document.getElementById('display-fullname').textContent = address.recipient;
+        document.getElementById('display-phone').textContent = address.phone;
+        document.getElementById('display-street').textContent = address.street;
+        document.getElementById('display-district').textContent = address.district;
+        document.getElementById('display-province').textContent = address.province;
+        document.getElementById('display-postal-code').textContent = address.postalCode;
+        document.getElementById('display-details').textContent = address.details || '-';
+        document.getElementById('display-type').textContent = address.type === 'rumah' ? 'Rumah' : 'Kantor';
+      }
+    });
+    
+    function copyCheckoutMessage() {
+      const message = document.getElementById('checkout-message').textContent;
+      navigator.clipboard.writeText(message).then(() => {
+        alert('Pesan berhasil disalin!');
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Detail Produk</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="product-header">
+    <button onclick="window.history.back()">⬅️</button>
+    <h2>DETAIL PRODUK</h2>
+  </header>
+
+  <main id="product-detail">
+    <!-- Bagian gambar produk (full width) -->
+    <div class="product-gallery">
+      <img id="product-image" src="" alt="Gambar Produk" class="main-image">
+      <div class="thumbnail-container">
+        <!-- Thumbnail akan diisi oleh JavaScript -->
+      </div>
+    </div>
+
+    <!-- Bagian info produk -->
+    <div class="product-info-container">
+      <div class="product-meta">
+        <h3 id="product-name">Nama Produk</h3>
+        <div class="rating-sold">
+          <span id="product-rating">⭐ 4.8</span>
+          <span id="product-sold">| Terjual: 120+</span>
+        </div>
+      </div>
+
+      <div class="product-price-section">
+        <div id="product-price" class="price-container">
+          <!-- Harga akan diisi oleh JavaScript -->
+        </div>
+      </div>
+
+      <div class="product-description-section">
+        <h4>Deskripsi Produk</h4>
+        <p id="product-description" class="product-description"></p>
+      </div>
+
+      <div class="product-specs">
+        <h4>Spesifikasi</h4>
+        <ul id="product-specs">
+          <!-- Spesifikasi akan diisi oleh JavaScript -->
+        </ul>
+      </div>
+    </div>
+  </main>
+
+  <div class="product-actions">
+    <button class="add-to-cart">+ Keranjang</button>
+    <button class="buy-now">Beli Sekarang</button>
+  </div>
+
+  <script src="produk.js"></script>
+  <!-- Di product-detail.html, tambahkan script untuk menampilkan thumbnail dan spesifikasi -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Ambil ID produk dari URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = parseInt(urlParams.get('id'));
+    const product = getProductById(productId);
+    
+    if (!product) {
+      alert("Produk tidak ditemukan");
+      window.location.href = "index.html";
+      return;
+    }
+    
+    // Tampilkan data produk
+    document.getElementById("product-name").textContent = product.name;
+    document.getElementById("product-description").textContent = product.desc;
+    document.getElementById("product-rating").textContent = `⭐ ${product.rating}`;
+    document.getElementById("product-sold").textContent = `| Terjual: ${product.sold}+`;
+    
+    // Format harga
+    const priceElement = document.getElementById("product-price");
+    if (product.discountedPrice) {
+      priceElement.innerHTML = `
+        <span class="original-price">Rp${product.price.toLocaleString('id-ID')}</span>
+        <span class="discount-price">Rp${product.discountedPrice.toLocaleString('id-ID')}</span>
+      `;
+    } else {
+      priceElement.textContent = `Rp${product.price.toLocaleString('id-ID')}`;
+    }
+    
+    // Set gambar utama
+    const mainImage = document.getElementById("product-image");
+    mainImage.src = product.image;
+    
+    // Tambahkan thumbnail
+    const thumbnailContainer = document.querySelector(".thumbnail-container");
+    product.gallery.forEach((imgSrc, index) => {
+      const thumbnail = document.createElement("img");
+      thumbnail.src = imgSrc;
+      thumbnail.alt = `Thumbnail ${index + 1}`;
+      thumbnail.addEventListener("click", () => {
+        mainImage.src = imgSrc;
+      });
+      thumbnailContainer.appendChild(thumbnail);
+    });
+    
+    // Tambahkan spesifikasi
+    const specsList = document.getElementById("product-specs");
+    for (const [key, value] of Object.entries(product.specifications)) {
+      const li = document.createElement("li");
+      li.innerHTML = `<strong>${key}:</strong> ${value}`;
+      specsList.appendChild(li);
+    }
+    
+    // Tambahkan event listener untuk tombol
+    document.querySelector(".add-to-cart").addEventListener("click", () => addToCart(product.id));
+    document.querySelector(".buy-now").addEventListener("click", () => buyNow(product.id));
+  });
+</script>
+</body>
+</html>
